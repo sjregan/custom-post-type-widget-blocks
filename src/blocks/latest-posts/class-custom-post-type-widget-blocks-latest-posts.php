@@ -9,6 +9,8 @@
 
 namespace Custom_Post_Type_Widget_Blocks\Blocks;
 
+use WP_Post;
+
 /**
  * Core class Custom_Post_Type_Widget_Blocks_Latest_Posts
  *
@@ -84,7 +86,7 @@ class Custom_Post_Type_Widget_Blocks_Latest_Posts {
 		$list_items_markup = '';
 
 		foreach ( $recent_posts as $post ) {
-			$post_link = esc_url( get_permalink( $post ) );
+			$post_url = esc_url( get_permalink( $post ) );
 			$title     = get_the_title( $post );
 
 			if ( ! $title ) {
@@ -111,6 +113,8 @@ class Custom_Post_Type_Widget_Blocks_Latest_Posts {
 					$image_classnames[] = 'align' . $attributes['featuredImageAlign'];
 				}
 
+				$featured_image = '';
+
 				if ( has_post_thumbnail( $post ) ) {
 					$featured_image = get_the_post_thumbnail(
 						$post,
@@ -132,14 +136,33 @@ class Custom_Post_Type_Widget_Blocks_Latest_Posts {
 					);
 				}
 
+				/**
+				 * Filters the featured image HTML for the Recent Posts block.
+				 *
+				 * @since NEXT
+				 *
+				 * @param string  $featured_image The featured image HTML.
+				 * @param WP_Post $post           The post object.
+				 * @param array   $args           Partially parsed block attributes.
+				 * @param array   $attributes     The block attributes.
+				 */
+				$featured_image = apply_filters(
+					'custom_post_type_widget_blocks/latest_posts/featured_image_html',
+					$featured_image,
+					$post,
+					$args,
+					$attributes
+				);
+
 				if ( $attributes['addLinkToFeaturedImage'] ) {
 					$featured_image = sprintf(
 						'<a href="%1$s" aria-label="%2$s">%3$s</a>',
-						esc_url( $post_link ),
+						esc_url( $post_url ),
 						esc_attr( $title ),
 						$featured_image
 					);
 				}
+
 				$list_items_markup .= sprintf(
 					'<div class="%1$s">%2$s</div>',
 					esc_attr( implode( ' ', $image_classnames ) ),
@@ -147,10 +170,32 @@ class Custom_Post_Type_Widget_Blocks_Latest_Posts {
 				);
 			}
 
-			$list_items_markup .= sprintf(
+			$title_html = sprintf(
 				'<a href="%1$s">%2$s</a>',
-				esc_url( $post_link ),
+				esc_url( $post_url ),
 				esc_html( $title )
+			);
+
+			/**
+			 * Filters the title HTML for the Recent Posts block.
+			 *
+			 * @since NEXT
+			 *
+			 * @param string  $title_html The title HTML including A tag.
+			 * @param string  $post_url   The post URL.
+			 * @param string  $title      The post title.
+			 * @param WP_Post $post       The post object.
+			 * @param array   $args       Partially parsed block attributes.
+			 * @param array   $attributes The block attributes.
+			 */
+			$list_items_markup .= apply_filters(
+				'custom_post_type_widget_blocks/latest_posts/item_title_html',
+				$title_html,
+				$post_url,
+				$title,
+				$post,
+				$args,
+				$attributes
 			);
 
 			if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {

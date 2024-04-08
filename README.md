@@ -169,6 +169,10 @@ For operation compatibility between PHP version and WordPress version, see below
 
 ## Changelog
 
+### NEXT
+
+* new filters: 'custom_post_type_widget_blocks/latest_posts/featured_image_html', 'custom_post_type_widget_blocks/latest_posts/item_title_html'.
+
 ### [1.6.2] - 2023.11.28
 
 * tested up to 6.4.1
